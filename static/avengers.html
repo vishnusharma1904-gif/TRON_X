@@ -98,6 +98,24 @@
     box-shadow: 0 0 24px rgba(0,229,255,.2);
   }
   .vu { transition: transform .08s linear; transform-origin: bottom; }
+
+  /* ---------- mobile ---------- */
+  @media (max-width: 760px) {
+    html, body { overflow: auto; }
+    .h-full { height: auto; min-height: 100%; }
+    header.flex { flex-wrap: wrap; gap: 8px; row-gap: 6px; }
+    header .flex.items-center.gap-4 { gap: 8px; flex-wrap: wrap; }
+    header .text-xl { font-size: 16px; }
+    main.flex-1 { flex-direction: column; min-height: 0; }
+    main.flex-1 > section.flex-\[1\.25\] { flex: 1 1 50vh; min-height: 320px; }
+    main.flex-1 > section.flex-1 { flex: 1 1 50vh; min-height: 280px; }
+    #boardroom .absolute.bottom-3 {
+      flex-wrap: wrap; justify-content: center; gap: 6px;
+      width: 100%; left: 0; transform: none; padding: 0 6px;
+    }
+    .btn { padding: 6px 10px; font-size: 10px; }
+    #roster-strip { flex-wrap: nowrap; }
+  }
 </style>
 </head>
 <body class="relative z-10">

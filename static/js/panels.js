@@ -516,12 +516,24 @@
   });
 
   // ── Sidebar toggle ────────────────────────────────────────────────────────
-  var _sidebarOpen = true;
+  // On small phone screens, start with the sidebar collapsed so it doesn't
+  // eat the whole layout — it's an absolute overlay at this breakpoint anyway.
+  var _sidebarOpen = !window.matchMedia('(max-width: 520px)').matches;
+  if (!_sidebarOpen) $('sidebar').classList.add('collapsed');
   function toggleSidebar() {
     _sidebarOpen = !_sidebarOpen;
     $('sidebar').classList.toggle('collapsed', !_sidebarOpen);
   }
   $('sidebar-toggle').addEventListener('click', toggleSidebar);
+
+  // Tapping outside an open overlay sidebar on small screens closes it.
+  document.addEventListener('click', function(e) {
+    if (!window.matchMedia('(max-width: 680px)').matches) return;
+    if (!_sidebarOpen) return;
+    var sb = $('sidebar');
+    if (sb.contains(e.target) || e.target.closest('#sidebar-toggle')) return;
+    toggleSidebar();
+  });
 
   // ── Welcome screen ────────────────────────────────────────────────────────
   function showWelcome(show) {
@@ -1520,23 +1532,37 @@
   var TBL={AI:1,HUD:1,SSE:1,API:1,URL:1,PTT:1,CPU:1,RAM:1,GPU:1,OK:1,NO:1,TV:1,PC:1,UI:1,THE:1,AT:1,IS:1,IN:1,OR:1,IT:1};
   function wbt(w,t){var i=t.indexOf(w);while(i!==-1){var b=i===0||!/[a-z]/.test(t[i-1]),a=i+w.length>=t.length||!/[a-z]/.test(t[i+w.length]);if(b&&a)return true;i=t.indexOf(w,i+1);}return false;}
 
+  // A "clear ask" — the user is requesting something, not just mentioning a
+  // word in passing. Used to gate the weather/stocks/news popup cards so they
+  // don't pop up for every casual mention of those keywords.
+  var ASK_RE = /\b(what'?s|whats|how'?s|hows|how is|how are|check|show( me)?|get( me)?|give me|tell me|fetch|find|search|display|pull up|look up|current|latest|today'?s|update on)\b/;
+  function isClearAsk(l) { return ASK_RE.test(l) || /\?\s*$/.test(l.trim()); }
+
   function detectIntent(msg) {
     var l=msg.toLowerCase();
-    if(/whether|weather|temperature|forecast|rain|snow|wind|humid|sunny|cloud|celsius|fahrenheit|drizzle|storm/.test(l)){
-      var loc='London';
-      var m1=l.match(/(?:weather|forecast|temperature|whether)(?:\s+in|\s+at|\s+for)\s+([a-z][a-z\s]{1,20}?)(?:\?|$|,|\.)/);
-      var m2=l.match(/([a-z][a-z\s]{1,15}?)\s+weather/);
-      if(m1) loc=m1[1].trim(); else if(m2) loc=m2[1].trim();
-      return {type:'weather',query:loc};
+    if(/\b(weather|forecast|temperature)\b/.test(l)){
+      var asksWeather = isClearAsk(l)
+        || /\b(weather|forecast|temperature)\s+(in|at|for|like|today|now|tomorrow)\b/.test(l)
+        || /\b[a-z][a-z\s]{1,15}?\s+weather\b/.test(l);
+      if (asksWeather) {
+        var loc='London';
+        var m1=l.match(/(?:weather|forecast|temperature)(?:\s+in|\s+at|\s+for)\s+([a-z][a-z\s]{1,20}?)(?:\?|$|,|\.)/);
+        var m2=l.match(/([a-z][a-z\s]{1,15}?)\s+weather/);
+        if(m1) loc=m1[1].trim(); else if(m2) loc=m2[1].trim();
+        return {type:'weather',query:loc};
+      }
     }
     for(var i=0;i<SHORT_C.length;i++) if(wbt(SHORT_C[i],l)) return {type:'crypto',query:CRYPTO_MAP[SHORT_C[i]]};
     for(var j=0;j<LONG_C.length;j++) if(l.indexOf(LONG_C[j])!==-1) return {type:'crypto',query:CRYPTO_MAP[LONG_C[j]]||LONG_C[j]};
     if(/\bcost(s|ing)?\b|\bspending\b|\bexpenditure(s)?\b|\bexpense(s)?\b|\bbilling\b|\bbudget(s|ing)?\b|how much.*(spen|cost)|token.*(cost|spend|usage)|api.*(cost|spend|usage)|usage.*cost|money.*(spent|used|spending)/.test(l)) return {type:'cost'};
     if(/crypto|coin|altcoin|blockchain|token|defi|nft/.test(l)) return {type:'crypto',query:'bitcoin'};
-    var tm=msg.match(/\b([A-Z]{2,5})\b/);
-    var tk=tm&&!TBL[tm[1]]?tm[1]:null;
-    if(/\bstock|share|equity|invest|trading|nasdaq|nyse|ipo\b/.test(l)||tk) return {type:'stocks',query:tk||'AAPL'};
-    if(/\bnews\b|headlines|latest news|current events|breaking/.test(l)){
+    if(/\b(stock price|share price|stock quote|quote for|stocks? of|shares of|stock for)\b/.test(l)
+       || (/\bstocks?\b/.test(l) && isClearAsk(l))) {
+      var tm=msg.match(/\b([A-Z]{1,5})\b/);
+      var tk=tm&&!TBL[tm[1]]?tm[1]:null;
+      return {type:'stocks',query:tk||'AAPL'};
+    }
+    if(/\bnews\b|headlines\b/.test(l) && (isClearAsk(l) || /news\s+(?:about|on|regarding|for)\b/.test(l))){
       var nm=l.match(/news\s+(?:about|on|regarding|for)\s+([a-z][a-z\s]{1,20}?)(?:\?|$|,|\.)/);
       return {type:'news',query:nm?nm[1].trim():null};
     }

@@ -1140,6 +1140,66 @@ html, body {
   .emotion-badge { display: none !important; }
 }
 
+/* ── Small phones ─────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  :root {
+    --topbar-h: 48px;
+    --sidebar-w: 82vw;
+  }
+
+  /* Topbar: shrink + allow controls to wrap/scroll instead of overflowing */
+  .topbar {
+    padding: 0 8px 0 6px;
+    gap: 4px;
+  }
+  .topbar-left {
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .topbar-right {
+    gap: 4px;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    max-width: 56vw;
+  }
+  .topbar-right::-webkit-scrollbar { display: none; }
+  .logo-version { display: none; }
+  .topbar-divider { display: none; }
+  .session-title-wrap { max-width: 90px; }
+  .telugu-badge,
+  .status-pill #conn-label,
+  .model-label { display: none !important; }
+  #sys-time { display: none; }
+  .icon-btn#text-toggle,
+  .icon-btn#agent-toggle,
+  .icon-btn#academic-toggle { font-size: 9px; padding: 4px 6px; }
+
+  /* Sidebar slides over full-width-ish on phones */
+  .sidebar { width: var(--sidebar-w); }
+  .sidebar.collapsed { width: 0; }
+
+  /* Welcome screen */
+  .welcome-title { font-size: 22px; }
+  .welcome-hints { max-width: 100%; gap: 6px; justify-content: center; }
+  .hint-chip { padding: 5px 10px; font-size: 10px; }
+
+  /* Messages */
+  .messages-area { padding: 12px 10px 6px; }
+  .chat-msg { max-width: 92%; }
+
+  /* Input row */
+  .input-area { padding: 8px 8px 10px; }
+  .input-row { gap: 6px; }
+  .persona-select { padding: 6px; font-size: 9px; max-width: 64px; }
+  .chat-input { padding: 8px 10px; font-size: 13px; max-height: 120px; }
+  .ptt-btn, .send-btn svg { flex-shrink: 0; }
+  .ptt-btn { width: 34px; height: 34px; }
+  .send-btn { padding: 8px 10px; font-size: 12px; gap: 4px; }
+  #chat-attach-btn { margin-right: 4px !important; }
+}
+
 /* ── Shared scrollbar ─────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
