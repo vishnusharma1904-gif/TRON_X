@@ -179,7 +179,10 @@
 
   function connect() {
     if (es) es.close();
-    es = new EventSource(`${API}/api/proactive/stream?backfill=10`);
+    let _key = "";
+    try { _key = localStorage.getItem("tronx_access_key") || ""; } catch (e) {}
+    const _qs = _key ? `&api_key=${encodeURIComponent(_key)}` : "";
+    es = new EventSource(`${API}/api/proactive/stream?backfill=10${_qs}`);
     es.onopen = () => {
       retryMs = 2000;
       statusEl.textContent = "LIVE";
