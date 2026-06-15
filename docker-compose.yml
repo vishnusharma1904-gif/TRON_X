@@ -1,0 +1,67 @@
+# ────────────────────────────────────────────────────────────────────────────
+# TRON-X  Docker Compose
+# Usage:
+#   cp .env.example .env && nano .env
+#   docker compose up -d
+# ────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  tronx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: tron-x:latest
+    container_name: tronx
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Override HOME so ChromaDB + analytics DB land in the volume
+      HOME: /data
+    volumes:
+      # Persistent data: ChromaDB, analytics SQLite, plugins, TTS cache
+      - tronx-data:/data
+      # Mount local plugins directory for hot-loading
+      - ./plugins:/data/.tronx/plugins:ro
+      # Optionally mount Google credentials
+      # - ./google_credentials.json:/app/google_credentials.json:ro
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+    networks:
+      - tronx-net
+
+  # Optional: local Ollama for fully offline LLM inference
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: tronx-ollama
+  #   restart: unless-stopped
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama-data:/root/.ollama
+  #   networks:
+  #     - tronx-net
+
+volumes:
+  tronx-data:
+    driver: local
+  # ollama-data:
+  #   driver: local
+
+networks:
+  tronx-net:
+    driver: bridge

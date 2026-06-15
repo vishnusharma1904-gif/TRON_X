@@ -1,0 +1,80 @@
+# ────────────────────────────────────────────────────────────────────────────
+# TRON-X systemd service unit
+#
+# Install:
+#   sudo cp deploy/tronx.service /etc/systemd/system/tronx.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now tronx
+#
+# Logs:
+#   journalctl -u tronx -f
+# ────────────────────────────────────────────────────────────────────────────
+
+[Unit]
+Description=TRON-X Autonomous AI Assistant
+Documentation=https://github.com/yourusername/tron-x
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=tronx
+Group=tronx
+
+# Working directory (adjust to your install path)
+WorkingDirectory=/opt/tronx
+
+# Load secrets from .env file (never committed to git)
+EnvironmentFile=/opt/tronx/.env
+
+# Override a few env vars for production
+Environment=APP_ENV=production
+Environment=DEBUG=false
+Environment=LOG_LEVEL=INFO
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+# Activate virtualenv and run uvicorn
+ExecStart=/opt/tronx/venv/bin/uvicorn src.main:app \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --workers 2 \
+    --loop uvloop \
+    --http httptools \
+    --no-access-log
+
+# Graceful shutdown timeout
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+# Auto-restart on failure
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/opt/tronx /home/tronx/.tronx /tmp
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+RestrictRealtime=true
+RestrictSUIDSGID=true
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=2G
+CPUQuota=200%
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRON-X Co-Work Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root {
+    --bg-base: #0B0F19;
+    --bg-panel: rgba(17, 24, 39, 0.7);
+    --bg-card: rgba(30, 41, 59, 0.5);
+    --border: rgba(148, 163, 184, 0.1);
+    --border-hover: rgba(148, 163, 184, 0.3);
+    --text-main: #F8FAFC;
+    --text-muted: #94A3B8;
+    --primary: #0EA5E9;
+    --primary-glow: rgba(14, 165, 233, 0.5);
+    --secondary: #8B5CF6;
+    --accent: #10B981;
+    --accent-glow: rgba(16, 185, 129, 0.4);
+    --danger: #EF4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    background: var(--bg-base);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.08), transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    background: rgba(11, 15, 25, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 10;
+  }
+  header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #0EA5E9, #8B5CF6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  header .sub { color: var(--text-muted); font-size: 13px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+  header .api-key { margin-left: auto; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 8px; width: 240px; font-size: 13px; transition: all 0.3s; }
+  header .api-key:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-glow); }
+
+  /* Main Layout */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    min-height: 0;
+  }
+
+  /* Left Panel */
+  aside {
+    background: var(--bg-panel);
+    backdrop-filter: blur(16px);
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+  }
+  
+  .control-group { display: flex; flex-direction: column; gap: 8px; }
+  label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; }
+  
+  textarea {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 140px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+    transition: all 0.3s;
+  }
+  textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 4px 12px var(--primary-glow); }
+
+  .modes {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .modes button {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 10px 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .modes button:hover { border-color: var(--border-hover); color: var(--text-main); }
+  .modes button.on {
+    background: rgba(14, 165, 233, 0.1);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .pro-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(139, 92, 246, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pro-toggle:hover { border-color: rgba(139, 92, 246, 0.5); }
+  .pro-toggle.active {
+    background: rgba(139, 92, 246, 0.15);
+    border-color: var(--secondary);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+  }
+  .pro-toggle input { display: none; }
+  .pro-toggle .indicator { width: 10px; height: 10px; border-radius: 50%; background: #334155; transition: background 0.3s; }
+  .pro-toggle.active .indicator { background: var(--secondary); box-shadow: 0 0 8px var(--secondary); }
+  .pro-toggle .text { font-size: 13px; font-weight: 500; color: var(--text-main); }
+  .pro-toggle .subtext { font-size: 11px; color: var(--secondary); margin-left: auto; }
+
+  .drop {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s;
+    background: rgba(255,255,255,0.02);
+  }
+  .drop:hover { border-color: var(--primary); background: rgba(14, 165, 233, 0.05); }
+  .drop.has { border-style: solid; border-color: var(--accent); background: rgba(16, 185, 129, 0.05); color: var(--accent); }
+  
+  #files { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
+  #files div { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); }
+  #files span.x { cursor: pointer; color: var(--danger); padding: 4px; border-radius: 4px; }
+  #files span.x:hover { background: rgba(239, 68, 68, 0.1); }
+
+  #go {
+    background: linear-gradient(135deg, #0EA5E9, #8B5CF6);
+    border: none;
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 2px;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+    margin-top: auto;
+  }
+  #go:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4); }
+  #go:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  #go.loading { animation: pulse 1.5s infinite; }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(14, 165, 233, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+  }
+
+  /* Right Board */
+  section {
+    padding: 32px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: relative;
+  }
+
+  .empty-state {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .empty-state h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; margin-bottom: 8px; color: var(--text-main); }
+  .empty-state p { font-size: 14px; }
+
+  .card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .card-header h3 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--primary); letter-spacing: 1px; }
+  
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: 11px; padding: 4px 10px; border-radius: 99px; border: 1px solid var(--border); color: var(--text-muted); font-weight: 500; background: rgba(255,255,255,0.03); }
+  .badge.success { color: var(--accent); border-color: var(--accent-glow); background: rgba(16, 185, 129, 0.1); }
+  .badge.info { color: var(--primary); border-color: var(--primary-glow); background: rgba(14, 165, 233, 0.1); }
+  .badge.pro { color: var(--secondary); border-color: rgba(139, 92, 246, 0.4); background: rgba(139, 92, 246, 0.1); }
+
+  /* Plan & Steps */
+  .plan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .step-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .step-card.pending { opacity: 0.6; }
+  .step-card.running { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); opacity: 1; }
+  .step-card.running::after {
+    content: ''; position: absolute; bottom: 0; left: 0; height: 2px; width: 30%; background: var(--primary);
+    animation: loader 1s infinite linear;
+  }
+  @keyframes loader { 0% { left: -30%; } 100% { left: 100%; } }
+  .step-card.done { border-color: var(--accent); opacity: 1; }
+  
+  .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .step-id { font-weight: 600; font-size: 13px; color: var(--text-main); }
+  .step-type { font-size: 11px; color: var(--secondary); background: rgba(139, 92, 246, 0.1); padding: 2px 8px; border-radius: 4px; }
+  .step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
+  
+  .step-result {
+    font-size: 13px; color: var(--text-main);
+    background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px;
+    max-height: 200px; overflow-y: auto; border: 1px solid var(--border);
+  }
+  
+  /* Markdown styling */
+  .md-content { line-height: 1.7; font-size: 14.5px; }
+  .md-content p { margin-bottom: 16px; }
+  .md-content h1, .md-content h2, .md-content h3 { font-family: 'Space Grotesk', sans-serif; color: white; margin: 24px 0 16px 0; }
+  .md-content ul, .md-content ol { padding-left: 24px; margin-bottom: 16px; }
+  .md-content li { margin-bottom: 8px; }
+  .md-content pre { background: #1e1e1e; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; border: 1px solid var(--border); }
+  .md-content code { font-family: 'Consolas', monospace; font-size: 13px; }
+  .md-content p code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; }
+  .md-content a { color: var(--primary); text-decoration: none; }
+  .md-content a:hover { text-decoration: underline; }
+
+  /* Blinking cursor for streaming */
+  .cursor::after {
+    content: '▋';
+    animation: blink 1s step-start infinite;
+    color: var(--primary);
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.4); }
+</style>
+</head>
+<body>
+<header>
+  <h1>TRON-X</h1>
+  <span class="sub">Co-Work Space</span>
+  <input class="api-key" id="apikey" type="password" placeholder="X-API-Key (optional)">
+</header>
+<main>
+  <aside>
+    <div class="control-group">
+      <label>Mission Directive</label>
+      <textarea id="goal" placeholder="Describe a complex goal... e.g. Research the latest advancements in quantum computing, write a python script to simulate a basic qbit, and summarize everything."></textarea>
+    </div>
+    
+    <div class="control-group">
+      <label>Execution Mode</label>
+      <div class="modes">
+        <button data-m="parallel" class="on">⚡ Parallel</button>
+        <button data-m="sequential">↧ Sequential</button>
+        <button data-m="reason">🧠 Reason</button>
+      </div>
+    </div>
+
+    <div class="pro-toggle" id="proToggle" title="Routes hard tasks to DeepSeek-V4-Pro">
+      <div class="indicator"></div>
+      <span class="text">Pro Reasoning</span>
+      <span class="subtext">V4-PRO</span>
+    </div>
+    
+    <div class="control-group">
+      <label>Context Attachments</label>
+      <div class="drop" id="drop">Click or drop files here<br><span style="opacity:0.5;font-size:11px">PDF, DOCX, Code, Images, ZIP</span></div>
+      <input id="fileinput" type="file" multiple hidden>
+      <div id="files"></div>
+    </div>
+
+    <button id="go">LAUNCH OPERATION</button>
+  </aside>
+  <section id="board">
+    <div class="empty-state">
+      <h2>System Standby</h2>
+      <p>Awaiting mission parameters to initiate agent pipeline.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+// Init Marked.js with syntax highlighting
+marked.setOptions({
+  highlight: function(code, lang) {
+    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+    return hljs.highlight(code, { language }).value;
+  }
+});
+
+const $ = s => document.querySelector(s);
+let mode = "parallel", files = [], isPro = false;
+
+// UI Interactions
+document.querySelectorAll(".modes button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".modes button").forEach(x => x.classList.remove("on"));
+  b.classList.add("on"); 
+  mode = b.dataset.m;
+});
+
+const proToggle = $("#proToggle");
+proToggle.onclick = () => {
+  isPro = !isPro;
+  proToggle.classList.toggle("active", isPro);
+};
+
+/* Attachments */
+const drop = $("#drop"), input = $("#fileinput");
+drop.onclick = () => input.click();
+drop.ondragover = e => { e.preventDefault(); };
+drop.ondrop = e => { e.preventDefault(); addFiles(e.dataTransfer.files); };
+input.onchange = () => addFiles(input.files);
+function addFiles(list){ for (const f of list) files.push(f); renderFiles(); }
+function renderFiles(){
+  drop.classList.toggle("has", files.length > 0);
+  drop.innerHTML = files.length > 0 ? `${files.length} file(s) attached` : `Click or drop files here<br><span style="opacity:0.5;font-size:11px">PDF, DOCX, Code, Images, ZIP</span>`;
+  $("#files").innerHTML = files.map((f,i) =>
+    `<div><span>${f.name} <em style="color:var(--text-muted)">${(f.size/1024).toFixed(1)}kB</em></span><span class="x" data-i="${i}">✕</span></div>`).join("");
+  document.querySelectorAll("#files .x").forEach(x => x.onclick = () => { files.splice(+x.dataset.i,1); renderFiles(); });
+}
+
+function headers(json=true){
+  const h = {}; if (json) h["Content-Type"] = "application/json";
+  const k = $("#apikey").value.trim(); if (k) h["X-API-Key"] = k;
+  return h;
+}
+
+const esc = s => String(s ?? "").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+function renderMarkdown(text) {
+  if (!text) return '';
+  var mathBlocks = [];
+  function stash(m) {
+    mathBlocks.push(m);
+    return '%%%MATH_BLOCK_' + (mathBlocks.length - 1) + '%%%';
+  }
+  text = text.replace(/\$\$[\s\S]+?\$\$/g, stash);
+  text = text.replace(/\\\[[\s\S]+?\\\]/g, stash);
+  text = text.replace(/\\\([\s\S]+?\\\)/g, stash);
+  text = text.replace(/(^|[^\\])\$([^\$\n]+?)\$/g, function(m, pre, math) {
+    mathBlocks.push('$' + math + '$');
+    return pre + '%%%MATH_BLOCK_' + (mathBlocks.length - 1) + '%%%';
+  });
+
+  if (window.marked) {
+    marked.setOptions({ breaks: true, gfm: true, headerIds: false, mangle: false });
+    var safe = marked.parse(text); // cowork doesn't use DOMPurify currently, so we just use marked output
+    for (var i = 0; i < mathBlocks.length; i++) {
+      var safeMath = (mathBlocks[i] || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      safe = safe.replace('%%%MATH_BLOCK_' + i + '%%%', function() { return safeMath; });
+    }
+    return safe;
+  }
+  return '<p class="md-p">' + esc(text).replace(/\n/g, '<br>') + '</p>';
+}
+
+function renderMessageMarkup(targetEl, text) {
+  if (!targetEl) return;
+  targetEl.innerHTML = renderMarkdown(text);
+  if (window.renderMathInElement) {
+    try {
+      window.renderMathInElement(targetEl, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false
+      });
+    } catch (e) {
+      console.warn('[math] render failed:', e);
+    }
+  }
+}
+
+async function launch(){
+  const goal = $("#goal").value.trim();
+  if (!goal) return;
+  
+  $("#go").disabled = true;
+  $("#go").classList.add("loading");
+  $("#go").textContent = "EXECUTING...";
+  
+  $("#board").innerHTML = ''; // clear
+
+  try {
+    let attachmentsPayload = null;
+    if (files.length) {
+      renderStatus("Processing attachments context...");
+      const fd = new FormData();
+      files.forEach(f => fd.append("files", f));
+      const uploadRes = await fetch("/api/attachments/process?full=true", { 
+        method: "POST", headers: headers(false), body: fd 
+      });
+      if (!uploadRes.ok) throw new Error("Failed to process attachments");
+      const uploadData = await uploadRes.json();
+      attachmentsPayload = uploadData.attachments;
+    }
+
+    if (mode === "reason") {
+      // Blocking reason call
+      renderStatus(`Running deliberative reasoning... ${isPro ? "(PRO)" : ""}`);
+      const r = await fetch("/api/agents/reason", { 
+        method:"POST", headers: headers(),
+        body: JSON.stringify({ question: goal, samples: 3, reflect: true, verify: true, pro: isPro, attachments: attachmentsPayload }) 
+      });
+      renderReason(goal, await r.json());
+    } else {
+      // SSE Streaming Pipeline
+      await runStreamedPipeline(goal, attachmentsPayload);
+    }
+  } catch (e) {
+    $("#board").innerHTML = `<div class="card"><div class="card-header"><h3 style="color:var(--danger)">Error</h3></div><div class="md-content">${esc(e.message)}</div></div>`;
+  } finally { 
+    $("#go").disabled = false; 
+    $("#go").classList.remove("loading");
+    $("#go").textContent = "LAUNCH OPERATION";
+  }
+}
+
+function renderStatus(msg) {
+  $("#board").innerHTML = `
+    <div class="empty-state">
+      <h2><span class="cursor">Processing</span></h2>
+      <p style="color:var(--primary)">${msg}</p>
+    </div>`;
+}
+
+// ---------------------------------------------------------
+// Stream Reader for /api/agents/run/stream
+// ---------------------------------------------------------
+async function runStreamedPipeline(goal, attachmentsPayload) {
+  // Setup UI skeleton
+  $("#board").innerHTML = `
+    <div class="card" id="card-goal">
+      <div class="card-header">
+        <h3>Mission Directive</h3>
+        <div class="badges">
+          <span class="badge info">${mode} mode</span>
+        </div>
+      </div>
+      </div>
+      <div class="md-content" id="goal-md-content"></div>
+    </div>
+    <div class="card" id="card-plan" style="display:none;">
+      <div class="card-header">
+        <h3>Execution Plan</h3>
+        <div class="badges" id="plan-badges"></div>
+      </div>
+      <div class="plan-grid" id="plan-grid"></div>
+    </div>
+    <div class="card" id="card-synth" style="display:none;">
+      <div class="card-header">
+        <h3>Final Synthesis</h3>
+        <div class="badges"><span class="badge success">Synthesising...</span></div>
+      </div>
+      <div class="md-content cursor" id="synth-content"></div>
+    </div>
+  `;
+  renderMessageMarkup(document.getElementById("goal-md-content"), goal);
+
+  const bodyPayload = { 
+    goal, 
+    mode, 
+    max_parallel: 4, 
+    attachments: attachmentsPayload
+  };
+
+  const response = await fetch("/api/agents/run/stream", {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify(bodyPayload)
+  });
+
+  if (!response.ok) throw new Error("HTTP " + response.status);
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    
+    const lines = buffer.split("\n\n");
+    buffer = lines.pop(); // keep partial chunk
+    
+    for (const line of lines) {
+      if (line.startsWith("data: ")) {
+        try {
+          const data = JSON.parse(line.substring(6));
+          handleStreamEvent(data);
+        } catch(e) { console.error("Parse error", e); }
+      }
+    }
+  }
+  $("#synth-content").classList.remove("cursor");
+}
+
+function handleStreamEvent(e) {
+  if (e.type === "plan") {
+    $("#card-plan").style.display = "block";
+    $("#plan-badges").innerHTML = `<span class="badge info">${e.tasks.length} tasks generated</span>`;
+    $("#plan-grid").innerHTML = e.tasks.map(t => `
+      <div class="step-card pending" id="step-${t.id}">
+        <div class="step-header">
+          <span class="step-id">${esc(t.id)}</span>
+          <span class="step-type">${esc(t.type)}</span>
+        </div>
+        <div class="step-desc">${esc(t.description)}</div>
+        <div class="step-result" style="display:none;"></div>
+      </div>
+    `).join("");
+  } 
+  else if (e.type === "task_start") {
+    const el = $(`#step-${e.task.id}`);
+    if (el) {
+      el.classList.remove("pending");
+      el.classList.add("running");
+      el.querySelector(".step-result").style.display = "block";
+      el.querySelector(".step-result").innerHTML = "<span class='cursor'>Executing...</span>";
+    }
+  }
+  else if (e.type === "task_result") {
+    const el = $(`#step-${e.task.id}`);
+    if (el) {
+      el.classList.remove("running");
+      el.classList.add("done");
+      if (!e.task.success) el.style.borderColor = "var(--danger)";
+      const res = e.task.result || e.task.error || "";
+      renderMessageMarkup(el.querySelector(".step-result"), res.slice(0, 1000) + (res.length>1000?"...":""));
+    }
+  }
+  else if (e.type === "synthesis_start") {
+    $("#card-synth").style.display = "block";
+  }
+  else if (e.type === "synthesis_chunk") {
+    const synthBox = $("#synth-content");
+    // We append RAW markdown, but since marked() replaces HTML, we should accumulate state
+    // For simplicity with streaming markdown, we just update the raw string and re-parse.
+    if (!synthBox.dataset.raw) synthBox.dataset.raw = "";
+    synthBox.dataset.raw += e.chunk;
+    renderMessageMarkup(synthBox, synthBox.dataset.raw);
+  }
+  else if (e.type === "error") {
+    $("#board").innerHTML += `<div class="card"><div class="md-content" style="color:var(--danger)">${esc(e.error)}</div></div>`;
+  }
+}
+
+// ---------------------------------------------------------
+// Legacy Renderers
+// ---------------------------------------------------------
+function renderReason(goal, d) {
+  const pct = Math.round((d.confidence ?? 0) * 100);
+  let html = `
+    <div class="card" id="card-goal">
+      <div class="card-header">
+        <h3>Mission Directive</h3>
+        <div class="badges"><span class="badge info">reason mode</span></div>
+      </div>
+      <div class="md-content" id="goal-md-content"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Deliberative Analysis</h3>
+        <div class="badges">
+          <span class="badge info">${d.samples} paths</span>
+          ${isPro ? '<span class="badge pro">PRO MODEL</span>' : ''}
+          ${(d.trace||[]).map(t => `<span class="badge">${esc(t)}</span>`).join("")}
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+        <span style="color:var(--text-muted); font-size:13px;">Agreement: ${Math.round((d.agreement ?? 0)*100)}%</span>
+        <span style="color:${pct > 80 ? 'var(--accent)' : 'var(--primary)'}; font-size:13px; font-weight:600;">Confidence: ${pct}%</span>
+      </div>
+      <div style="height:4px; background:var(--bg-card); border-radius:4px; overflow:hidden; margin-bottom:24px;">
+        <div style="height:100%; width:${pct}%; background:var(--accent); transition:width 1s;"></div>
+      </div>
+      ${d.verified && d.verified.issue ? `<p style="font-size:12px; color:var(--danger); margin-bottom:16px;">Verifier note: ${esc(d.verified.issue)}</p>` : ""}
+      <div class="md-content" id="reason-final-content"></div>
+    </div>`;
+
+  $("#board").innerHTML = html;
+  
+  renderMessageMarkup(document.getElementById("goal-md-content"), goal);
+  renderMessageMarkup(document.getElementById("reason-final-content"), d.reply ?? d.answer ?? JSON.stringify(d).slice(0,500));
+  hljs.highlightAll();
+}
+
+$("#goal").addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey||e.metaKey)) launch(); });
+$("#go").onclick = launch;
+</script>
+</body>
+</html>

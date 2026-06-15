@@ -1,0 +1,583 @@
+{
+  "_comment": "TRON-X Model Registry \u2014 100+ open-source models across 14 providers",
+  "_model_count": 106,
+  "_provider_count": 14,
+  "categories": {
+    "fast_chat": {
+      "_desc": "General chat \u2014 fastest possible response",
+      "primary": "groq/qwen-2.5-32b",
+      "fallbacks": [
+        "groq/llama-3.1-8b-instant",
+        "openrouter/deepseek/deepseek-v4-flash",
+        "fireworks_ai/accounts/fireworks/models/deepseek-v4-flash",
+        "groq/llama-3.3-70b-versatile",
+        "cerebras/llama-3.3-70b",
+        "openrouter/meta-llama/llama-3.3-70b-instruct:free"
+      ]
+    },
+    "reasoning": {
+      "_desc": "Deep reasoning, multi-step thinking, logic puzzles",
+      "primary": "openrouter/deepseek/deepseek-r1:free",
+      "fallbacks": [
+        "groq/llama-3.3-70b-versatile",
+        "fireworks_ai/accounts/fireworks/models/deepseek-v4-flash",
+        "openrouter/deepseek/deepseek-chat-v3-0324:free"
+      ]
+    },
+    "reasoning_pro": {
+      "_desc": "Only for the hardest tasks",
+      "primary": "openrouter/deepseek/deepseek-v4-pro",
+      "fallbacks": []
+    },
+    "coding": {
+      "_desc": "Code generation, debugging, technical implementation",
+      "primary": "together_ai/Qwen/Qwen2.5-Coder-32B-Instruct",
+      "fallbacks": [
+        "fireworks_ai/accounts/fireworks/models/qwen2p5-coder-32b-instruct",
+        "deepinfra/Qwen/Qwen2.5-Coder-32B-Instruct",
+        "fireworks_ai/accounts/fireworks/models/deepseek-coder-v2-instruct",
+        "together_ai/deepseek-ai/DeepSeek-V3",
+        "deepseek/deepseek-coder",
+        "mistral/codestral-latest",
+        "openrouter/deepseek/deepseek-coder-v2:free",
+        "groq/llama-3.3-70b-versatile"
+      ]
+    },
+    "vision": {
+      "_desc": "Image understanding, multimodal tasks",
+      "primary": "gemini/gemini-2.0-flash",
+      "fallbacks": [
+        "groq/llama-3.2-11b-vision-preview",
+        "groq/llama-3.2-90b-vision-preview",
+        "openrouter/google/gemini-2.0-pro-exp-02-05:free",
+        "openrouter/google/gemini-2.0-flash-lite-preview-02-05:free",
+        "openrouter/qwen/qwen2.5-vl-72b-instruct:free"
+      ]
+    },
+    "math": {
+      "_desc": "Mathematical reasoning, equations, quantitative analysis",
+      "primary": "together_ai/deepseek-ai/DeepSeek-R1",
+      "fallbacks": [
+        "deepseek/deepseek-reasoner",
+        "deepinfra/deepseek-ai/DeepSeek-R1",
+        "openrouter/deepseek/deepseek-r1:free",
+        "fireworks_ai/accounts/fireworks/models/deepseek-r1",
+        "openrouter/microsoft/phi-4-reasoning-plus:free",
+        "cerebras/llama-3.3-70b"
+      ]
+    },
+    "creative": {
+      "_desc": "Creative writing, storytelling, imaginative tasks",
+      "primary": "together_ai/Qwen/Qwen2.5-72B-Instruct-Turbo",
+      "fallbacks": [
+        "mistral/mistral-small-latest",
+        "fireworks_ai/accounts/fireworks/models/qwen2p5-72b-instruct",
+        "together_ai/mistralai/Mixtral-8x22B-Instruct-v0.1",
+        "deepinfra/Qwen/Qwen2.5-72B-Instruct",
+        "groq/llama-3.3-70b-versatile"
+      ]
+    },
+    "research": {
+      "_desc": "Web-grounded research, live information, citations",
+      "primary": "perplexity/sonar-pro",
+      "fallbacks": [
+        "perplexity/sonar-reasoning",
+        "perplexity/sonar",
+        "together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+        "cohere/command-r-plus",
+        "groq/llama-3.3-70b-versatile"
+      ]
+    },
+    "academic": {
+      "_desc": "Research papers, citations, scholarly analysis",
+      "primary": "cohere/command-r-plus",
+      "fallbacks": [
+        "openrouter/deepseek/deepseek-v4-flash",
+        "together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+        "deepinfra/meta-llama/Meta-Llama-3.1-70B-Instruct",
+        "mistral/open-mixtral-8x22b",
+        "cerebras/llama-3.3-70b",
+        "groq/llama-3.3-70b-versatile"
+      ]
+    },
+    "medical": {
+      "_desc": "Medical/health queries \u2014 accuracy critical",
+      "primary": "together_ai/deepseek-ai/DeepSeek-R1",
+      "fallbacks": [
+        "openrouter/deepseek/deepseek-v4-flash",
+        "deepseek/deepseek-reasoner",
+        "openrouter/deepseek/deepseek-r1:free",
+        "deepinfra/deepseek-ai/DeepSeek-R1",
+        "cohere/command-r-plus",
+        "cerebras/llama-3.3-70b",
+        "groq/llama-3.3-70b-versatile"
+      ]
+    },
+    "long_context": {
+      "_desc": "Long documents, 128k+ context windows",
+      "primary": "gemini/gemini-2.0-flash",
+      "fallbacks": [
+        "gemini/gemini-1.5-flash",
+        "together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+        "mistral/open-mistral-nemo",
+        "deepinfra/meta-llama/Meta-Llama-3.1-70B-Instruct",
+        "groq/llama-3.1-70b-versatile"
+      ]
+    },
+    "fast_edge": {
+      "_desc": "Ultra-fast, lightweight \u2014 sub-500ms responses",
+      "primary": "groq/qwen-2.5-32b",
+      "fallbacks": [
+        "groq/llama-3.1-8b-instant",
+        "cerebras/llama-3.1-8b",
+        "groq/gemma2-9b-it",
+        "fireworks_ai/accounts/fireworks/models/llama-v3p1-8b-instruct",
+        "deepinfra/meta-llama/Meta-Llama-3.1-8B-Instruct",
+        "ollama/llama3.2"
+      ]
+    },
+    "iot": {
+      "_desc": "IoT/smart-home commands \u2014 fast + concise",
+      "primary": "groq/llama-3.1-8b-instant",
+      "fallbacks": [
+        "cerebras/llama-3.1-8b",
+        "groq/gemma2-9b-it",
+        "fireworks_ai/accounts/fireworks/models/gemma2-9b-it",
+        "groq/llama-3.3-70b-versatile"
+      ]
+    },
+    "system": {
+      "_desc": "OS/system control \u2014 reliable + structured output",
+      "primary": "groq/llama-3.3-70b-versatile",
+      "fallbacks": [
+        "cerebras/llama-3.3-70b",
+        "fireworks_ai/accounts/fireworks/models/llama-v3p3-70b-instruct",
+        "together_ai/meta-llama/Meta-Llama-3.3-70B-Instruct-Turbo",
+        "groq/llama-3.1-8b-instant"
+      ]
+    },
+    "cad": {
+      "_desc": "CAD / design / technical specifications",
+      "primary": "together_ai/Qwen/Qwen2.5-Coder-32B-Instruct",
+      "fallbacks": [
+        "fireworks_ai/accounts/fireworks/models/qwen2p5-coder-32b-instruct",
+        "groq/llama-3.3-70b-versatile",
+        "together_ai/deepseek-ai/DeepSeek-V3"
+      ]
+    }
+  },
+  "intent_to_category": {
+    "chat": "fast_chat",
+    "casual": "fast_chat",
+    "general": "fast_chat",
+    "reasoning": "reasoning",
+    "logic": "reasoning",
+    "analysis": "reasoning",
+    "reasoning_pro": "reasoning_pro",
+    "hard": "reasoning_pro",
+    "coding": "coding",
+    "code": "coding",
+    "programming": "coding",
+    "debug": "coding",
+    "vision": "vision",
+    "image": "vision",
+    "photo": "vision",
+    "math": "math",
+    "calculation": "math",
+    "equation": "math",
+    "creative": "creative",
+    "writing": "creative",
+    "story": "creative",
+    "research": "research",
+    "search": "research",
+    "news": "research",
+    "academic": "academic",
+    "science": "academic",
+    "paper": "academic",
+    "medical": "medical",
+    "health": "medical",
+    "symptoms": "medical",
+    "long_context": "long_context",
+    "document": "long_context",
+    "summarize": "long_context",
+    "fast": "fast_edge",
+    "quick": "fast_edge",
+    "iot": "iot",
+    "smarthome": "iot",
+    "device": "iot",
+    "system": "system",
+    "os": "system",
+    "file": "system",
+    "cad": "cad",
+    "design": "cad",
+    "auto": "fast_chat"
+  },
+  "provider_configs": {
+    "groq": {
+      "_models": [
+        "groq/qwen-2.5-32b",
+        "groq/llama-3.3-70b-versatile",
+        "groq/llama-3.1-70b-versatile",
+        "groq/llama-3.1-8b-instant",
+        "groq/llama3-70b-8192",
+        "groq/llama3-8b-8192",
+        "groq/mixtral-8x7b-32768",
+        "groq/gemma2-9b-it"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "seed",
+        "user",
+        "response_format",
+        "logprobs",
+        "top_logprobs",
+        "n"
+      ],
+      "rpm_limit": 30,
+      "tpm_limit": 6000,
+      "context_window": 128000,
+      "env_key": "GROQ_API_KEY"
+    },
+    "cerebras": {
+      "_models": [
+        "cerebras/llama-3.1-8b",
+        "cerebras/llama-3.3-70b",
+        "cerebras/llama-3.3-70b"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "seed",
+        "user"
+      ],
+      "rpm_limit": 30,
+      "tpm_limit": null,
+      "context_window": 128000,
+      "env_key": "CEREBRAS_API_KEY"
+    },
+    "openrouter": {
+      "_models": [
+        "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+        "openrouter/meta-llama/llama-3.1-70b-instruct:free",
+        "openrouter/meta-llama/llama-3.2-11b-vision-instruct:free",
+        "openrouter/meta-llama/llama-3.2-3b-instruct:free",
+        "openrouter/meta-llama/llama-3.2-1b-instruct:free",
+        "openrouter/google/gemma-3-27b-it:free",
+        "openrouter/google/gemma-3-12b-it:free",
+        "openrouter/microsoft/phi-4-reasoning-plus:free",
+        "openrouter/deepseek/deepseek-r1:free",
+        "openrouter/deepseek/deepseek-v4-pro",
+        "openrouter/deepseek/deepseek-r1-distill-llama-70b:free",
+        "openrouter/deepseek/deepseek-coder-v2:free",
+        "openrouter/deepseek/deepseek-chat-v3-0324:free",
+        "openrouter/mistralai/mistral-7b-instruct:free",
+        "openrouter/nvidia/llama-3.1-nemotron-70b-instruct:free",
+        "openrouter/cohere/command-r7b-12-2024:free"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "top_k",
+        "repetition_penalty",
+        "seed",
+        "user",
+        "response_format",
+        "min_p",
+        "top_a"
+      ],
+      "rpm_limit": 20,
+      "tpm_limit": null,
+      "context_window": 128000,
+      "env_key": "OPENROUTER_API_KEY"
+    },
+    "gemini": {
+      "_models": [
+        "gemini/gemini-2.0-flash",
+        "gemini/gemini-1.5-flash",
+        "gemini/gemini-2.0-flash-lite"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "candidate_count",
+        "seed"
+      ],
+      "rpm_limit": 15,
+      "tpm_limit": null,
+      "context_window": 1000000,
+      "env_key": "GEMINI_API_KEY"
+    },
+    "together_ai": {
+      "_models": [
+        "together_ai/meta-llama/Meta-Llama-3.3-70B-Instruct-Turbo",
+        "together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+        "together_ai/meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+        "together_ai/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+        "together_ai/mistralai/Mixtral-8x22B-Instruct-v0.1",
+        "together_ai/mistralai/Mixtral-8x7B-Instruct-v0.1",
+        "together_ai/mistralai/Mistral-7B-Instruct-v0.3",
+        "together_ai/Qwen/Qwen2.5-72B-Instruct-Turbo",
+        "together_ai/Qwen/Qwen2.5-Coder-32B-Instruct",
+        "together_ai/deepseek-ai/DeepSeek-R1",
+        "together_ai/deepseek-ai/DeepSeek-V3",
+        "together_ai/deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+        "together_ai/google/gemma-2-27b-it",
+        "together_ai/google/gemma-2-9b-it",
+        "together_ai/codellama/CodeLlama-70b-Instruct-hf",
+        "together_ai/Phind/Phind-CodeLlama-34B-v2",
+        "together_ai/zero-one-ai/Yi-34B-Chat",
+        "together_ai/upstage/SOLAR-10.7B-Instruct-v1.0",
+        "together_ai/nvidia/Llama-3.1-Nemotron-70B-Instruct-HF"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "seed",
+        "user",
+        "top_k",
+        "repetition_penalty",
+        "n"
+      ],
+      "rpm_limit": 60,
+      "tpm_limit": null,
+      "context_window": 128000,
+      "env_key": "TOGETHER_API_KEY"
+    },
+    "fireworks_ai": {
+      "_models": [
+        "fireworks_ai/accounts/fireworks/models/llama-v3p3-70b-instruct",
+        "fireworks_ai/accounts/fireworks/models/llama-v3p1-70b-instruct",
+        "fireworks_ai/accounts/fireworks/models/llama-v3p1-8b-instruct",
+        "fireworks_ai/accounts/fireworks/models/llama-v3p2-3b-instruct",
+        "fireworks_ai/accounts/fireworks/models/mixtral-8x22b-instruct",
+        "fireworks_ai/accounts/fireworks/models/mixtral-8x7b-instruct",
+        "fireworks_ai/accounts/fireworks/models/qwen2p5-72b-instruct",
+        "fireworks_ai/accounts/fireworks/models/qwen2p5-coder-32b-instruct",
+        "fireworks_ai/accounts/fireworks/models/deepseek-r1",
+        "fireworks_ai/accounts/fireworks/models/deepseek-v3",
+        "fireworks_ai/accounts/fireworks/models/deepseek-coder-v2-instruct",
+        "fireworks_ai/accounts/fireworks/models/gemma2-9b-it",
+        "fireworks_ai/accounts/fireworks/models/yi-large",
+        "fireworks_ai/accounts/fireworks/models/deepseek-v4-flash"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "seed",
+        "user",
+        "top_k",
+        "n"
+      ],
+      "rpm_limit": 60,
+      "tpm_limit": null,
+      "context_window": 131072,
+      "env_key": "FIREWORKS_AI_API_KEY"
+    },
+    "deepinfra": {
+      "_models": [
+        "deepinfra/meta-llama/Meta-Llama-3.3-70B-Instruct",
+        "deepinfra/meta-llama/Meta-Llama-3.1-70B-Instruct",
+        "deepinfra/meta-llama/Meta-Llama-3.1-8B-Instruct",
+        "deepinfra/meta-llama/Llama-3.2-11B-Vision-Instruct",
+        "deepinfra/mistralai/Mixtral-8x22B-Instruct-v0.1",
+        "deepinfra/mistralai/Mixtral-8x7B-Instruct-v0.1",
+        "deepinfra/mistralai/Mistral-7B-Instruct-v0.3",
+        "deepinfra/Qwen/Qwen2.5-72B-Instruct",
+        "deepinfra/Qwen/Qwen2.5-Coder-32B-Instruct",
+        "deepinfra/deepseek-ai/DeepSeek-R1",
+        "deepinfra/deepseek-ai/DeepSeek-V3",
+        "deepinfra/deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+        "deepinfra/google/gemma-2-27b-it",
+        "deepinfra/nvidia/Llama-3.1-Nemotron-70B-Instruct"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "seed",
+        "user",
+        "top_k",
+        "n"
+      ],
+      "rpm_limit": 60,
+      "tpm_limit": null,
+      "context_window": 131072,
+      "env_key": "DEEPINFRA_API_KEY"
+    },
+    "mistral": {
+      "_models": [
+        "mistral/open-mistral-nemo",
+        "mistral/open-mistral-7b",
+        "mistral/open-mixtral-8x7b",
+        "mistral/open-mixtral-8x22b",
+        "mistral/mistral-small-latest",
+        "mistral/codestral-latest",
+        "mistral/mistral-medium-latest"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "seed",
+        "safe_prompt",
+        "random_seed",
+        "response_format",
+        "user"
+      ],
+      "rpm_limit": 20,
+      "tpm_limit": null,
+      "context_window": 128000,
+      "env_key": "MISTRAL_API_KEY"
+    },
+    "cohere": {
+      "_models": [
+        "cohere/command-r-plus",
+        "cohere/command-r",
+        "cohere/command-light",
+        "cohere/command"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "stream",
+        "stop",
+        "seed",
+        "p",
+        "k",
+        "frequency_penalty",
+        "presence_penalty"
+      ],
+      "rpm_limit": 20,
+      "tpm_limit": null,
+      "context_window": 128000,
+      "env_key": "COHERE_API_KEY"
+    },
+    "perplexity": {
+      "_models": [
+        "perplexity/sonar-pro",
+        "perplexity/sonar-reasoning",
+        "perplexity/sonar",
+        "perplexity/sonar-reasoning-pro"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "search_domain_filter",
+        "search_recency_filter",
+        "return_images",
+        "return_related_questions"
+      ],
+      "rpm_limit": 20,
+      "tpm_limit": null,
+      "context_window": 127072,
+      "env_key": "PERPLEXITYAI_API_KEY"
+    },
+    "deepseek": {
+      "_models": [
+        "deepseek/deepseek-chat",
+        "deepseek/deepseek-reasoner",
+        "deepseek/deepseek-coder"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "seed",
+        "user",
+        "response_format"
+      ],
+      "rpm_limit": 60,
+      "tpm_limit": null,
+      "context_window": 65536,
+      "env_key": "DEEPSEEK_API_KEY"
+    },
+    "huggingface": {
+      "_models": [
+        "huggingface/HuggingFaceH4/zephyr-7b-beta",
+        "huggingface/mistralai/Mixtral-8x7B-Instruct-v0.1",
+        "huggingface/microsoft/phi-3-mini-4k-instruct",
+        "huggingface/tiiuae/falcon-7b-instruct",
+        "huggingface/bigcode/starcoder2-15b"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop"
+      ],
+      "rpm_limit": 10,
+      "tpm_limit": null,
+      "context_window": 32768,
+      "env_key": "HUGGINGFACE_API_KEY"
+    },
+    "ollama": {
+      "_models": [
+        "ollama/llama3.2",
+        "ollama/llama3.1",
+        "ollama/codellama",
+        "ollama/deepseek-coder-v2",
+        "ollama/qwen2.5",
+        "ollama/mistral",
+        "ollama/phi3"
+      ],
+      "safe_params": [
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "stream",
+        "stop",
+        "top_k",
+        "repeat_penalty",
+        "seed",
+        "frequency_penalty"
+      ],
+      "rpm_limit": 999,
+      "tpm_limit": null,
+      "context_window": 32768,
+      "env_key": null
+    }
+  }
+}

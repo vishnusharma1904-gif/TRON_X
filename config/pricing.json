@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "description": "Approximate per-1K-token USD pricing for TRON-X's model catalog (Phase 34 Cost & Usage Dashboard). Provider list prices change frequently -- treat these numbers as estimates, not invoices.",
+    "unit": "usd_per_1k_tokens",
+    "pricing_last_updated": "2025-05-01",
+    "note": "Free-tier providers (groq, ollama, cerebras) and openrouter models with a ':free' suffix are priced at $0 explicitly. All other figures are rough estimates derived from each provider's public pricing pages -- verify before relying on these numbers for budgeting. Update provider_defaults / model_overrides as pricing changes; the dashboard surfaces pricing_last_updated so stale data is visible."
+  },
+  "free_suffix_markers": [":free"],
+  "provider_defaults": {
+    "groq":        {"input": 0.0,     "output": 0.0,     "free_tier": true},
+    "ollama":      {"input": 0.0,     "output": 0.0,     "free_tier": true},
+    "cerebras":    {"input": 0.0,     "output": 0.0,     "free_tier": true},
+    "cohere":      {"input": 0.0025,  "output": 0.01,    "free_tier": false},
+    "deepinfra":   {"input": 0.00013, "output": 0.0004,  "free_tier": false},
+    "deepseek":    {"input": 0.00027, "output": 0.0011,  "free_tier": false},
+    "fireworks_ai":{"input": 0.0009,  "output": 0.0009,  "free_tier": false},
+    "gemini":      {"input": 0.000075,"output": 0.0003,  "free_tier": false},
+    "mistral":     {"input": 0.0002,  "output": 0.0006,  "free_tier": false},
+    "openrouter":  {"input": 0.0006,  "output": 0.0006,  "free_tier": false},
+    "perplexity":  {"input": 0.001,   "output": 0.001,   "free_tier": false},
+    "together_ai": {"input": 0.00088, "output": 0.00088, "free_tier": false}
+  },
+  "model_overrides": {
+    "gemini/gemini-1.5-flash":  {"input": 0.000075, "output": 0.0003},
+    "gemini/gemini-2.0-flash":  {"input": 0.0001,   "output": 0.0004},
+    "deepseek/deepseek-coder":   {"input": 0.00027, "output": 0.0011},
+    "deepseek/deepseek-reasoner":{"input": 0.00055, "output": 0.00219},
+    "perplexity/sonar":           {"input": 0.001, "output": 0.001},
+    "perplexity/sonar-pro":       {"input": 0.003, "output": 0.015},
+    "perplexity/sonar-reasoning": {"input": 0.001, "output": 0.005},
+    "cohere/command-r-plus":      {"input": 0.0025, "output": 0.01},
+    "mistral/codestral-latest":     {"input": 0.0003,  "output": 0.0009},
+    "mistral/mistral-small-latest": {"input": 0.0001,  "output": 0.0003},
+    "mistral/open-mistral-nemo":    {"input": 0.00015, "output": 0.00015},
+    "mistral/open-mixtral-8x22b":   {"input": 0.002,   "output": 0.006},
+    "openrouter/deepseek/deepseek-v4-flash": {"input": 0.00027, "output": 0.0011},
+    "fireworks_ai/accounts/fireworks/models/gemma2-9b-it":          {"input": 0.0002,  "output": 0.0002},
+    "fireworks_ai/accounts/fireworks/models/llama-v3p1-8b-instruct":{"input": 0.0002,  "output": 0.0002},
+    "deepinfra/meta-llama/Meta-Llama-3.1-8B-Instruct":      {"input": 0.00003, "output": 0.00005},
+    "deepinfra/meta-llama/Llama-3.2-11B-Vision-Instruct":   {"input": 0.00006, "output": 0.00006},
+    "cerebras/llama-3.1-8b":  {"input": 0.0, "output": 0.0},
+    "cerebras/llama-3.3-70b": {"input": 0.0, "output": 0.0}
+  }
+}

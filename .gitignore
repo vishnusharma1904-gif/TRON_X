@@ -1,0 +1,50 @@
+# --- Secrets -----------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Python --------------------------------------------------------------
+__pycache__/
+*.py[oc]
+*.egg-info/
+build/
+dist/
+wheels/
+.venv/
+venv/
+
+# --- Logs / runtime data ---------------------------------------------------
+logs/
+*.log
+
+# --- Memory / vector store / caches ----------------------------------------
+memory/chroma/
+memory/cache/
+memory/whatsapp_contacts.json
+memory/whatsapp_messages.json
+
+# --- Models (large binaries) ------------------------------------------------
+models/*.onnx
+models/*.bin
+*.pt
+*.npz
+
+# --- WhatsApp bridge ---------------------------------------------------------
+whatsapp-bridge/node_modules/
+whatsapp-bridge/auth/
+whatsapp-bridge/*.log
+
+# --- Kokoro TTS submodule artifacts -------------------------------------------
+kokoro-onnx-model-files-v1.1.zip
+
+# --- Encrypted backups (Phase 33) ---------------------------------------------
+backups/
+memory_pre_restore/
+
+# --- OS / editor ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

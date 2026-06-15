@@ -1,0 +1,37 @@
+app:
+  name: "TRON-X"
+  version: "1.0.0"
+  description: "Autonomous AI Assistant — Jarvis/Friday Architecture"
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+  workers: 1
+
+memory:
+  chroma_path: "./memory/chroma"
+  cache_path: "./memory/cache"
+  max_context_tokens: 8000       # trim conversation history beyond this
+  top_k_rag: 5                   # how many RAG chunks to inject
+  session_ttl_hours: 24
+
+router:
+  max_retries_per_model: 2
+  cooldown_after_failures: 3     # mark degraded after N consecutive failures
+  cooldown_duration_seconds: 120
+  default_temperature: 0.7
+  default_max_tokens: 2048
+  request_timeout_seconds: 60
+
+logging:
+  level: "INFO"
+  format: "rich"                 # rich | json
+  file: "./logs/tron_x.log"
+  rotation: "10 MB"
+  retention: "7 days"
+
+cors:
+  allow_origins: ["*"]
+  allow_methods: ["*"]
+  allow_headers: ["*"]

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRON-X // A.V.E.N.G.E.R.S PROTOCOL</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --core: #00e5ff;
+    --bg0: #03060c;
+    --bg1: #060b16;
+    --grid: rgba(0, 229, 255, 0.05);
+    --amber: #ffb703;
+    --danger: #ef233c;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; overflow: hidden;
+    background: var(--bg0);
+    color: #cfe9f2;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 42%, rgba(0,229,255,0.07), transparent 70%),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 100% 100%, 44px 44px, 44px 44px;
+  }
+  body::after { /* scanlines */
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 3px);
+    opacity: .35;
+  }
+  .mono { font-family: 'Cascadia Code', 'Consolas', 'JetBrains Mono', monospace; }
+
+  /* ---------- boardroom ---------- */
+  #boardroom svg { width: 100%; height: 100%; }
+  .node-glyph { font-size: 15px; }
+  .node { cursor: pointer; transition: filter .25s ease; }
+  .node circle.halo { opacity: 0; transition: opacity .3s ease; }
+  .node.active circle.halo { opacity: 1; animation: haloPulse 1.1s ease-in-out infinite; }
+  .node.error circle.halo { opacity: 1; stroke: var(--danger) !important; }
+  .node:hover circle.shell { stroke-width: 2.5; }
+  .beam { stroke-dasharray: 6 7; opacity: 0; transition: opacity .25s ease; }
+  .beam.on { opacity: .85; animation: beamFlow 1s linear infinite; }
+  @keyframes haloPulse { 0%,100% { stroke-opacity:.85; r-anim: 0;} 50% { stroke-opacity:.25; } }
+  @keyframes beamFlow { to { stroke-dashoffset: -26; } }
+  @keyframes coreSpin { to { transform: rotate(360deg); } }
+  @keyframes coreSpinR { to { transform: rotate(-360deg); } }
+  .ring-a, .ring-b { transform-origin: center; transform-box: fill-box; }
+  .ring-a { animation: coreSpin 24s linear infinite; }
+  .ring-b { animation: coreSpinR 38s linear infinite; }
+  .core-listening .ring-a { animation-duration: 4s; }
+  .core-listening .ring-b { animation-duration: 6s; }
+
+  /* ---------- console ---------- */
+  #console { scrollbar-width: thin; scrollbar-color: #0e3a4a transparent; }
+  #console::-webkit-scrollbar { width: 6px; }
+  #console::-webkit-scrollbar-thumb { background: #0e3a4a; border-radius: 3px; }
+  .ln       { white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
+  .ln-log   { color: #3e6f80; }
+  .ln-warn  { color: var(--amber); }
+  .ln-err   { color: var(--danger); }
+  .ln-user  { color: #e8fbff; }
+  .ln-agent { color: #9beaf7; }
+  .ln-ops   { color: #c9a7ff; }
+  .ln-sys   { color: #51808f; font-style: italic; }
+  .cursor::after { content: "▋"; animation: blink 1s steps(1) infinite; color: var(--core); }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    border: 1px solid rgba(0,229,255,.35); border-radius: 3px;
+    padding: 1px 8px; font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: #7fdfef;
+  }
+  .glow-line { box-shadow: 0 0 12px rgba(0,229,255,.35); }
+  .btn {
+    border: 1px solid rgba(0,229,255,.4); color: #aef0fb;
+    padding: 6px 14px; font-size: 11px; letter-spacing: .18em;
+    text-transform: uppercase; border-radius: 3px; background: rgba(0,229,255,.06);
+    transition: all .2s ease; cursor: pointer; user-select: none;
+  }
+  .btn:hover { background: rgba(0,229,255,.16); box-shadow: 0 0 14px rgba(0,229,255,.3); }
+  .btn.hot { border-color: var(--danger); color: #ffb3bd; background: rgba(239,35,60,.12);
+             box-shadow: 0 0 16px rgba(239,35,60,.35); }
+  #cmd { caret-color: var(--core); }
+  #cmd:focus { outline: none; box-shadow: 0 0 0 1px rgba(0,229,255,.5), 0 0 18px rgba(0,229,255,.15); }
+
+  #tooltip {
+    position: fixed; z-index: 60; pointer-events: none; display: none;
+    background: rgba(4,12,20,.95); border: 1px solid rgba(0,229,255,.4);
+    padding: 8px 12px; font-size: 11px; max-width: 280px; border-radius: 4px;
+    box-shadow: 0 0 24px rgba(0,229,255,.2);
+  }
+  .vu { transition: transform .08s linear; transform-origin: bottom; }
+</style>
+</head>
+<body class="relative z-10">
+
+<div class="h-full flex flex-col p-3 gap-3">
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="flex items-center justify-between px-4 py-2 border border-cyan-400/25 rounded bg-cyan-400/[0.03] glow-line">
+    <div class="flex items-center gap-4">
+      <div class="text-xl tracking-[0.35em] font-light text-cyan-300">TRON<span class="text-cyan-500">-X</span></div>
+      <div class="badge">JARVIS A.V.E.N.G.E.R.S PROTOCOL</div>
+      <div class="badge" id="net-badge">LINK: OFFLINE</div>
+    </div>
+    <div class="flex items-center gap-2 mono text-[11px]">
+      <span id="lang-badge" class="badge hidden">LANG</span>
+      <span id="emotion-badge" class="badge hidden">EMOTION</span>
+      <span id="clock" class="text-cyan-600"></span>
+      <a href="/classic" class="btn">CLASSIC HUD</a>
+    </div>
+  </header>
+
+  <!-- ============ MAIN SPLIT ============ -->
+  <main class="flex-1 flex gap-3 min-h-0">
+
+    <!-- VIEWPORT 1 · THE BOARDROOM -->
+    <section class="flex-[1.25] min-w-0 border border-cyan-400/25 rounded relative bg-cyan-400/[0.02] overflow-hidden">
+      <div class="absolute top-2 left-3 z-10 text-[11px] tracking-[0.3em] text-cyan-500">VIEWPORT 1 · THE BOARDROOM</div>
+      <div class="absolute top-2 right-3 z-10 mono text-[11px] text-cyan-700" id="active-agent">CORE: STANDBY</div>
+      <div id="boardroom" class="absolute inset-0"></div>
+      <!-- voice controls -->
+      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
+        <svg id="vu-meter" width="46" height="22" class="opacity-80">
+          <rect class="vu" x="2"  y="2" width="5" height="18" fill="#0e3a4a"></rect>
+          <rect class="vu" x="10" y="2" width="5" height="18" fill="#0e3a4a"></rect>
+          <rect class="vu" x="18" y="2" width="5" height="18" fill="#0e3a4a"></rect>
+          <rect class="vu" x="26" y="2" width="5" height="18" fill="#0e3a4a"></rect>
+          <rect class="vu" x="34" y="2" width="5" height="18" fill="#0e3a4a"></rect>
+        </svg>
+        <button id="btn-ptt"  class="btn">⦿ TALK&nbsp;<span class="text-cyan-700">[space]</span></button>
+        <button id="btn-wake" class="btn">WAKE-WORD: OFF</button>
+        <button id="btn-voice" class="btn">VOICE OUT: ON</button>
+        <button id="btn-agent" class="btn">AGENT MODE: OFF</button>
+        <button id="btn-agent-stop" class="btn hot hidden">■ STOP CHAIN</button>
+      </div>
+    </section>
+
+    <!-- VIEWPORT 2 · THE COMMAND CONSOLE -->
+    <section class="flex-1 min-w-0 border border-cyan-400/25 rounded bg-black/40 flex flex-col overflow-hidden">
+      <div class="px-3 py-2 border-b border-cyan-400/20 flex items-center justify-between">
+        <span class="text-[11px] tracking-[0.3em] text-cyan-500">VIEWPORT 2 · COMMAND CONSOLE</span>
+        <span class="mono text-[10px] text-cyan-700" id="console-meta">logs/tron_x.log · live</span>
+      </div>
+      <div id="console" class="mono flex-1 overflow-y-auto px-3 py-2 text-[12px] space-y-px"></div>
+      <div class="border-t border-cyan-400/20 p-2 flex gap-2 items-center">
+        <span class="mono text-cyan-400 text-sm pl-1">❯</span>
+        <input id="cmd" type="text" autocomplete="off" spellcheck="false"
+               placeholder="issue directive… (e.g. 'vision status report' · 'add lead Stark Industries from referral')"
+               class="mono flex-1 bg-transparent border border-cyan-400/25 rounded px-3 py-2 text-[13px] text-cyan-100 placeholder:text-cyan-900">
+        <button id="btn-send" class="btn">EXEC</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ ROSTER STRIP ============ -->
+  <footer class="border border-cyan-400/25 rounded px-3 py-1.5 bg-cyan-400/[0.02] flex items-center gap-2 overflow-x-auto" id="roster-strip"></footer>
+</div>
+
+<div id="tooltip"></div>
+<script src="/static/js/avengers.js"></script>
+</body>
+</html>

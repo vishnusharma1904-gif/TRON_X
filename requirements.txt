@@ -1,0 +1,76 @@
+# ── Core ─────────────────────────────────────────────────────────────────────
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+python-multipart==0.0.20
+httpx>=0.27.0
+aiofiles==24.1.0
+
+# ── LLM Orchestration ────────────────────────────────────────────────────────
+litellm>=1.63.2
+
+# ── Memory / Vector DB ───────────────────────────────────────────────────────
+chromadb==0.5.23
+sentence-transformers==3.3.1
+
+# ── Supabase ─────────────────────────────────────────────────────────────────
+supabase==2.10.0
+
+# ── Voice ────────────────────────────────────────────────────────────────────
+groq==0.13.1
+edge-tts==6.1.12          # fallback TTS
+kokoro-onnx==0.5.0        # local CPU TTS (Kokoro v1.1-zh)
+soundfile==0.13.1         # wav encoding for Kokoro output
+sounddevice==0.5.1
+scipy==1.14.1
+numpy==2.1.3
+
+# ── Scheduling ───────────────────────────────────────────────────────────────
+apscheduler==3.10.4
+
+# ── System Control (Phase 6) ─────────────────────────────────────────────────
+psutil==6.1.0              # CPU/RAM/disk info
+pyautogui==0.9.54          # screenshots + GUI automation
+Pillow==11.0.0             # screenshot images
+playwright==1.49.0         # browser automation (run: playwright install chromium)
+PyMuPDF==1.24.14           # PDF reading in file ingestion (fitz)
+python-docx==1.1.2         # Word document reading
+python-pptx==1.0.2         # Phase 38: PowerPoint attachment extraction
+openpyxl==3.1.5            # Phase 38: Excel attachment extraction
+
+# ── Phase 3: Intelligent Web Search ─────────────────────────────────────────
+trafilatura>=1.12.0        # HTML content extraction (article text from raw HTML)
+# Serper.dev API called via httpx (already listed above) — no extra package needed
+# Brave Search API also via httpx
+
+# ── Phase 4: Computer Vision & Desktop Control ───────────────────────────────
+mss>=9.0.1                 # Fast multi-monitor screen capture
+# pyautogui, Pillow already listed under Phase 6 above
+
+# ── Autonomous Agents (Phase 8) ──────────────────────────────────────────────
+duckduckgo-search==6.3.7   # Free web search for Research Agent
+# cadquery==2.4.0          # 3D CAD model generation — NOT compatible with Python 3.13
+                           # Install manually via conda on Python 3.11 if needed:
+                           #   conda install -c cadquery cadquery=2.4.0
+
+# ── IoT / Home Automation (Phase 7) ────────────────────────────────────────
+paho-mqtt==2.1.0           # MQTT broker client (Mosquitto/Zigbee2MQTT)
+websockets==13.1           # HA WebSocket real-time events
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+rich==13.9.4
+tenacity==9.0.0
+PyYAML==6.0.2
+python-jose==3.3.0
+orjson==3.10.12
+tiktoken==0.8.0
+
+# ── Security Agent (recon & scope gate) ──────────────────────────────────────
+# Pure-Python recon needs nothing extra (uses stdlib ssl/socket + httpx + PyYAML).
+# Active scanners are EXTERNAL binaries you install yourself (not via pip):
+#   nmap        https://nmap.org/download.html        (apt install nmap)
+#   nuclei      https://github.com/projectdiscovery/nuclei  (+ nuclei -update-templates)
+#   testssl.sh  https://github.com/drwetter/testssl.sh
+python-nmap==0.7.1          # optional helper; agent also parses nmap XML directly
