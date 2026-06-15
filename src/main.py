@@ -358,6 +358,7 @@ from src.api.proactive     import router as proactive_router    # Phase 37
 from src.api.attachments   import router as attachments_router  # Phase 38
 from src.api.self          import router as self_router         # Phase 38
 from src.api.avengers      import router as avengers_router     # A.V.E.N.G.E.R.S Protocol
+from src.api.admin         import router as admin_router        # Per-user privacy / admin review
 
 app.include_router(health_router)
 app.include_router(chat_router)
@@ -381,6 +382,7 @@ app.include_router(proactive_router)                            # Phase 37
 app.include_router(attachments_router)                          # Phase 38
 app.include_router(self_router)                                  # Phase 38
 app.include_router(avengers_router)                              # A.V.E.N.G.E.R.S Protocol
+app.include_router(admin_router)                                 # Admin-only cross-user review
 
 # Analytics HTTP middleware -- fire-and-forget request recording (Phase 17)
 from src.analytics.middleware import add_analytics_middleware

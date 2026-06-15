@@ -179,9 +179,14 @@
 
   function connect() {
     if (es) es.close();
-    let _key = "";
-    try { _key = localStorage.getItem("tronx_access_key") || ""; } catch (e) {}
-    const _qs = _key ? `&api_key=${encodeURIComponent(_key)}` : "";
+    let _uid = "", _adminKey = "";
+    try {
+      _uid = localStorage.getItem("tronx_user_id") || "";
+      _adminKey = localStorage.getItem("tronx_admin_key") || "";
+    } catch (e) {}
+    let _qs = "";
+    if (_uid) _qs += `&user_id=${encodeURIComponent(_uid)}`;
+    if (_adminKey) _qs += `&api_key=${encodeURIComponent(_adminKey)}`;
     es = new EventSource(`${API}/api/proactive/stream?backfill=10${_qs}`);
     es.onopen = () => {
       retryMs = 2000;

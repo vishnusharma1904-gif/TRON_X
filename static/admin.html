@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/static/js/auth-gate.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TRON-X · Admin Review</title>
+<style>
+  :root { --bg:#03060c; --panel:#0a1018; --line:rgba(0,229,255,.18); --core:#00e5ff; --txt:#cfe9f2; --dim:#5f8a99; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; min-height:100%; background:var(--bg); color:var(--txt);
+    font-family: 'Segoe UI', system-ui, sans-serif; }
+  header { padding: 14px 20px; border-bottom: 1px solid var(--line); display:flex; align-items:center; gap:12px; }
+  header .title { font-size: 18px; letter-spacing: .2em; color: var(--core); }
+  header .sub { font-size: 12px; color: var(--dim); }
+  #status { padding: 10px 20px; font-size: 13px; color: var(--dim); }
+  #status.error { color: #ff8080; }
+  .layout { display:flex; gap: 16px; padding: 16px 20px; align-items:flex-start; }
+  .col { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
+  .col h2 { margin: 4px 8px 8px; font-size: 12px; letter-spacing: .15em; color: var(--dim); text-transform: uppercase; }
+  #users { width: 280px; max-height: 78vh; overflow-y: auto; }
+  #sessions { width: 320px; max-height: 78vh; overflow-y: auto; }
+  #history { flex: 1; max-height: 78vh; overflow-y: auto; }
+  .row { padding: 8px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+  .row:hover { background: rgba(0,229,255,.06); }
+  .row.active { background: rgba(0,229,255,.12); border: 1px solid var(--line); }
+  .row .meta { font-size: 11px; color: var(--dim); margin-top: 2px; }
+  .msg { padding: 8px 10px; margin: 6px 0; border-radius: 4px; font-size: 13px; white-space: pre-wrap; }
+  .msg.user { background: rgba(255,255,255,.04); }
+  .msg.assistant { background: rgba(0,229,255,.05); }
+  .msg .role { font-size: 10px; letter-spacing: .15em; color: var(--dim); text-transform: uppercase; margin-bottom: 4px; }
+  .empty { color: var(--dim); font-size: 13px; padding: 12px; }
+  code { color: var(--core); }
+</style>
+</head>
+<body>
+  <header>
+    <div class="title">TRON-X // ADMIN REVIEW</div>
+    <div class="sub">Cross-user chat history &amp; memory — admin key required</div>
+  </header>
+  <div id="status">Checking admin access…</div>
+  <div class="layout">
+    <div class="col" id="users"><h2>Users</h2><div id="users-list"></div></div>
+    <div class="col" id="sessions"><h2>Sessions</h2><div id="sessions-list" class="empty">Select a user</div></div>
+    <div class="col" id="history"><h2>History</h2><div id="history-list" class="empty">Select a session</div></div>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  const statusEl = document.getElementById("status");
+  const usersList = document.getElementById("users-list");
+  const sessionsList = document.getElementById("sessions-list");
+  const historyList = document.getElementById("history-list");
+
+  async function api(path) {
+    const r = await fetch(path);
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      throw new Error(`${r.status} ${body.detail || r.statusText}`);
+    }
+    return r.json();
+  }
+
+  function fmtTime(ts) {
+    if (!ts) return "";
+    try { return new Date(ts * 1000).toLocaleString(); } catch (e) { return ""; }
+  }
+
+  async function loadUsers() {
+    try {
+      const data = await api("/api/admin/users");
+      statusEl.textContent = `${data.users.length} user(s) seen`;
+      statusEl.className = "";
+      usersList.innerHTML = "";
+      if (!data.users.length) {
+        usersList.innerHTML = '<div class="empty">No users yet</div>';
+        return;
+      }
+      data.users.forEach((u) => {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `<div><code>${u.user_id}</code></div>
+          <div class="meta">${u.session_count} session(s) · last active ${fmtTime(u.last_active)}</div>`;
+        row.addEventListener("click", () => {
+          document.querySelectorAll("#users-list .row").forEach((r) => r.classList.remove("active"));
+          row.classList.add("active");
+          loadSessions(u.user_id === "unclaimed" ? "" : u.user_id);
+        });
+        usersList.appendChild(row);
+      });
+    } catch (e) {
+      statusEl.textContent = "Admin access denied: " + e.message +
+        "  — open this page once with ?admin_key=YOUR_KEY (set as API_KEYS in .env on the server).";
+      statusEl.className = "error";
+    }
+  }
+
+  async function loadSessions(userId) {
+    sessionsList.innerHTML = '<div class="empty">Loading…</div>';
+    historyList.innerHTML = '<div class="empty">Select a session</div>';
+    try {
+      const qs = userId ? `?user_id=${encodeURIComponent(userId)}` : "?user_id=unclaimed_does_not_exist";
+      // For "unclaimed" users we still want sessions whose user_id is null,
+      // which the API returns when user_id filter isn't a real id; fall back
+      // to listing everything and filtering client-side for that case.
+      let sessions;
+      if (userId) {
+        sessions = (await api(`/api/admin/sessions?user_id=${encodeURIComponent(userId)}`)).sessions;
+      } else {
+        sessions = (await api(`/api/admin/sessions`)).sessions.filter((s) => !s.user_id);
+      }
+      sessionsList.innerHTML = "";
+      if (!sessions.length) {
+        sessionsList.innerHTML = '<div class="empty">No sessions</div>';
+        return;
+      }
+      sessions.forEach((s) => {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `<div>${(s.title || s.preview || "New Chat").slice(0, 60)}</div>
+          <div class="meta">${s.persona} · ${s.message_count} msgs · ${fmtTime(s.updated_at)}</div>`;
+        row.addEventListener("click", () => {
+          document.querySelectorAll("#sessions-list .row").forEach((r) => r.classList.remove("active"));
+          row.classList.add("active");
+          loadHistory(s.id);
+        });
+        sessionsList.appendChild(row);
+      });
+    } catch (e) {
+      sessionsList.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
+    }
+  }
+
+  async function loadHistory(sessionId) {
+    historyList.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      const data = await api(`/api/admin/sessions/${sessionId}/history`);
+      historyList.innerHTML = "";
+      if (!data.messages.length) {
+        historyList.innerHTML = '<div class="empty">No messages</div>';
+        return;
+      }
+      data.messages.forEach((m) => {
+        const div = document.createElement("div");
+        div.className = "msg " + (m.role === "user" ? "user" : "assistant");
+        div.innerHTML = `<div class="role">${m.role}</div>`;
+        const body = document.createElement("div");
+        body.textContent = m.content || "";
+        div.appendChild(body);
+        historyList.appendChild(div);
+      });
+    } catch (e) {
+      historyList.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
+    }
+  }
+
+  loadUsers();
+})();
+</script>
+</body>
+</html>

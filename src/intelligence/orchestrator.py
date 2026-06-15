@@ -249,7 +249,7 @@ class Orchestrator:
 
     # ── Session helpers ────────────────────────────────────────────────────────
 
-    def create_session(self, persona: str = "jarvis") -> str:
+    def create_session(self, persona: str = "jarvis", user_id: str | None = None) -> str:
         sid = str(uuid.uuid4())
         self._sessions[sid] = {
             "id": sid,
@@ -258,9 +258,10 @@ class Orchestrator:
             "messages": [],
             "metadata": {},
             "title": None,
+            "user_id": user_id,
         }
         _save_sessions(self._sessions)
-        log.info(f"[orchestrator] New session {sid[:8]}... (persona={persona})")
+        log.info(f"[orchestrator] New session {sid[:8]}... (persona={persona}, user={(user_id or '?')[:8]})")
         return sid
 
     def get_session(self, session_id: str) -> dict:
@@ -268,11 +269,26 @@ class Orchestrator:
             raise SessionNotFoundError(f"Session '{session_id}' not found")
         return self._sessions[session_id]
 
-    def list_sessions(self) -> list[dict]:
+    def session_owner(self, session_id: str) -> str | None:
+        """Returns the owning user_id of a session, or None if unowned/unknown."""
+        s = self._sessions.get(session_id)
+        return s.get("user_id") if s else None
+
+    def claim_session(self, session_id: str, user_id: str) -> None:
+        """Assigns an owner to a legacy session that has no user_id yet."""
+        s = self._sessions.get(session_id)
+        if s is not None and s.get("user_id") is None and user_id:
+            s["user_id"] = user_id
+            _save_sessions(self._sessions)
+
+    def list_sessions(self, user_id: str | None = None) -> list[dict]:
         results = []
         for s in self._sessions.values():
             # Skip internal / system sessions (e.g. episodic extraction)
             if s.get("id", "").startswith("__"):
+                continue
+            # Scope to a single user unless explicitly listing all (admin)
+            if user_id is not None and s.get("user_id") not in (None, user_id):
                 continue
             msgs = s.get("messages", [])
             preview = ""
@@ -289,9 +305,23 @@ class Orchestrator:
                 "message_count": len(msgs),
                 "preview":       preview,
                 "title":         title,
+                "user_id":       s.get("user_id"),
             })
         results.sort(key=lambda x: x["updated_at"], reverse=True)
         return results
+
+    def list_users(self) -> list[dict]:
+        """Admin helper: distinct user_ids with session counts / last activity."""
+        users: dict[str, dict] = {}
+        for s in self._sessions.values():
+            if s.get("id", "").startswith("__"):
+                continue
+            uid = s.get("user_id") or "unclaimed"
+            updated = s.get("updated_at", s.get("created_at", 0))
+            u = users.setdefault(uid, {"user_id": uid, "session_count": 0, "last_active": 0})
+            u["session_count"] += 1
+            u["last_active"] = max(u["last_active"], updated)
+        return sorted(users.values(), key=lambda x: x["last_active"], reverse=True)
 
     def clear_session(self, session_id: str) -> None:
         if session_id in self._sessions:
@@ -511,6 +541,7 @@ class Orchestrator:
         rag_context: str | None = None,
         image_data: list | None = None,
         extra_system: str | None = None,
+        user_id: str | None = None,
     ) -> dict:
         """
         Full pipeline: intent -> persona -> CoT -> route -> post-process.
@@ -523,10 +554,13 @@ class Orchestrator:
             self._sessions[session_id] = {
                 "id": session_id, "created_at": time.time(),
                 "persona": persona or "jarvis", "messages": [], "metadata": {}, "title": None,
+                "user_id": user_id,
             }
         elif not session_id or session_id not in self._sessions:
-            session_id = self.create_session(persona=persona or "jarvis")
+            session_id = self.create_session(persona=persona or "jarvis", user_id=user_id)
         session = self._sessions[session_id]
+        if session.get("user_id") is None and user_id:
+            session["user_id"] = user_id
         active_persona = persona or session.get("persona", "jarvis")
 
         # 1b. Action commands (e.g. WhatsApp send) — act instead of chatting
@@ -848,6 +882,7 @@ class Orchestrator:
         max_tokens: int | None = None,
         extra_system: str | None = None,
         image_data: list | None = None,
+        user_id: str | None = None,
     ) -> AsyncGenerator[dict, None]:
         """
         Streaming pipeline — same setup as chat() but yields SSE dicts.
@@ -865,10 +900,13 @@ class Orchestrator:
             self._sessions[session_id] = {
                 "id": session_id, "created_at": time.time(),
                 "persona": persona or "jarvis", "messages": [], "metadata": {}, "title": None,
+                "user_id": user_id,
             }
         elif not session_id or session_id not in self._sessions:
-            session_id = self.create_session(persona=persona or "jarvis")
+            session_id = self.create_session(persona=persona or "jarvis", user_id=user_id)
         session = self._sessions[session_id]
+        if session.get("user_id") is None and user_id:
+            session["user_id"] = user_id
         active_persona = persona or session.get("persona", "jarvis")
 
         # 1b. Action commands (e.g. WhatsApp send) — act instead of chatting
