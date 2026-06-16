@@ -160,6 +160,44 @@ import re as _re
 
 _WEB_SEARCH_INTENTS: frozenset = frozenset({"research", "academic"})
 
+# ── Trivial message detector (route to cheapest/fastest model) ────────────────
+# Matches basic greetings, acks, and one-word replies that need zero reasoning.
+_TRIVIAL_RE = _re.compile(
+    r"^\s*(hi+|hey+|hello+|howdy|hiya|heya|sup|what'?s\s+up|whatsup|yo+|hola|namaste|"
+    r"vanakkam|namaskar|salaam|"
+    r"thanks?|thank\s+you|ty|thx|tnx|thks|tq|tysm|tyvm|"
+    r"ok+|okay|kk|k|cool|sure|got\s+it|noted|roger|understood|"
+    r"bye+|goodbye|good\s*bye|cya|see\s+ya|ttyl|later|"
+    r"good\s+morning|gm|good\s+afternoon|good\s+evening|good\s+night|gn|"
+    r"yes+|no+|yep|nope|nah|yeah+|yup|yea|"
+    r"nice|great|awesome|perfect|good|wow|amazing|"
+    r"lol|haha|hehe|lmao|😊|😄|👍|🙏)\s*[.!?🙂😊👍]*\s*$",
+    _re.IGNORECASE,
+)
+
+# Most capable model for Tenglish / multilingual conversations
+_TENGLISH_PREFERRED_MODEL  = "openrouter/deepseek/deepseek-r1:free"
+_TENGLISH_FALLBACK_MODEL   = "together_ai/deepseek-ai/DeepSeek-R1"
+_TENGLISH_CATEGORY         = "reasoning"
+
+# Cheapest/fastest model for trivial English messages
+_TRIVIAL_PREFERRED_MODEL   = "groq/llama-3.1-8b-instant"
+_TRIVIAL_CATEGORY          = "fast_edge"
+
+
+def _is_trivial_message(text: str) -> bool:
+    """
+    Returns True if the message is a basic greeting / ack / one-liner
+    that requires no reasoning — safe to route to the lightest model.
+    """
+    stripped = text.strip()
+    if not stripped:
+        return False
+    # Hard word-count gate: trivial messages are short
+    if len(stripped.split()) > 6:
+        return False
+    return bool(_TRIVIAL_RE.match(stripped))
+
 _LIVE_DATA_PATTERN = _re.compile(
     r"\b(latest|current|today|breaking\s+news|recent|"
     r"2024|2025|2026|"
@@ -755,6 +793,28 @@ class Orchestrator:
         # 6. Assemble messages
         category        = _INTENT_TO_CATEGORY.get(classified_intent, "fast_chat")
         preferred_model = _INTENT_PREFERRED_MODELS.get(classified_intent)
+
+        # ── Telugu/Tenglish override → most capable model ─────────────────────
+        # When user writes in Tenglish, Romanised Telugu, Telugu script, or Hyderabadi,
+        # force the highest-capability model for nuanced multilingual understanding.
+        if telugu_state.detected and telugu_state.requires_high_model:
+            category        = _TENGLISH_CATEGORY
+            preferred_model = _TENGLISH_PREFERRED_MODEL
+            log.info(
+                f"[orchestrator] Telugu override: dialect={telugu_state.dialect} "
+                f"(conf={telugu_state.confidence:.0%}) → "
+                f"category={_TENGLISH_CATEGORY}, model={_TENGLISH_PREFERRED_MODEL}"
+            )
+        # ── Trivial English override → cheapest/fastest model ─────────────────
+        # Basic greetings and acks (hi, hello, thanks, ok) need no reasoning.
+        elif not telugu_state.detected and _is_trivial_message(user_message):
+            category        = _TRIVIAL_CATEGORY
+            preferred_model = _TRIVIAL_PREFERRED_MODEL
+            log.debug(
+                f"[orchestrator] Trivial message detected → "
+                f"category={_TRIVIAL_CATEGORY}, model={_TRIVIAL_PREFERRED_MODEL}"
+            )
+
         messages        = self._build_messages(session["messages"], user_content, system_prompt)
 
         # 7. Route to LLM
@@ -1122,7 +1182,25 @@ class Orchestrator:
         # 6. Messages (using async version to prevent event loop blocking)
         category        = _INTENT_TO_CATEGORY.get(classified_intent, "fast_chat")
         preferred_model = _INTENT_PREFERRED_MODELS.get(classified_intent)
-        
+
+        # ── Telugu/Tenglish override → most capable model ─────────────────────
+        if telugu_state.detected and telugu_state.requires_high_model:
+            category        = _TENGLISH_CATEGORY
+            preferred_model = _TENGLISH_PREFERRED_MODEL
+            log.info(
+                f"[orchestrator/stream] Telugu override: dialect={telugu_state.dialect} "
+                f"(conf={telugu_state.confidence:.0%}) → "
+                f"category={_TENGLISH_CATEGORY}, model={_TENGLISH_PREFERRED_MODEL}"
+            )
+        # ── Trivial English override → cheapest/fastest model ─────────────────
+        elif not telugu_state.detected and _is_trivial_message(user_message):
+            category        = _TRIVIAL_CATEGORY
+            preferred_model = _TRIVIAL_PREFERRED_MODEL
+            log.debug(
+                f"[orchestrator/stream] Trivial message → "
+                f"category={_TRIVIAL_CATEGORY}, model={_TRIVIAL_PREFERRED_MODEL}"
+            )
+
         log.info("[orchestrator/stream] Awaiting _build_messages_async")
         messages        = await self._build_messages_async(session["messages"], user_content, system_prompt)
         log.info("[orchestrator/stream] Messages built successfully")

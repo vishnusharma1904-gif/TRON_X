@@ -123,24 +123,69 @@ _INTENT_PATTERNS: dict[str, list[str]] = {
     ],
 }
 
-# Telugu/Tenglish keywords that map to standard intents
+# Telugu/Tenglish keywords that map to standard intents (expanded v2)
 _TELUGU_INTENT_OVERRIDES: dict[str, list[str]] = {
     "coding": [
-        "code chesanu", "code cheyyi", "bug fix", "code pani",
-        "program rayu", "error vasthundi",
+        "code chesanu", "code cheyyi", "bug fix", "code pani", "code raasanu",
+        "program rayu", "error vasthundi", "error ochindi", "error vastundi",
+        "fix chesanu", "fix cheyyi", "debug chesanu", "deploy chesanu",
+        "push chesanu", "commit chesanu", "test chesanu", "build chesanu",
+        "function rayu", "script rayu", "api chesanu",
+        "work avvaledu", "test fail aindi", "compile ayindi",
     ],
     "academic": [
         "chaduvuko", "chadivo", "exam notes", "subject explain",
-        "theory em", "concept em undi", "study material",
+        "theory em", "concept em undi", "study material", "concept cheppu",
+        "exam pov", "exam ki", "assignment chesanu", "notes raasanu",
+        "syllabus em undi", "viva ki", "internals ki",
+        "btech", "b.tech", "engineering lo",
+    ],
+    "math": [
+        "calculate chesanu", "solve cheyyi", "equation solve",
+        "formula em undi", "calculate cheyyi",
+    ],
+    "medical": [
+        "health em aindi", "doctor daggara", "medicine em teesukovali",
+        "symptom em undi", "fever vasthundi",
+    ],
+    "research": [
+        "research chesanu", "search cheyyi", "web lo chudanu",
+        "latest news em undi", "information kavali",
+    ],
+    "iot": [
+        "light on cheyyi", "fan on cheyyi", "ac on cheyyi",
+        "light off cheyyi", "fan off cheyyi",
+        "smart home chesanu", "device control chesanu",
     ],
     "chat": [
+        # Casual Tenglish greetings and small-talk
         "em chestunnav", "ela unnav", "ki re bro", "enti jarigindi",
-        "baaga unnava", "sup machcha",
+        "baaga unnava", "sup machcha", "em aindi",
+        "ela undi", "ela unnaru", "baaga unna",
+        "em chesav", "enti chesav", "yella okay ga",
+        "what's up ra", "what's up bro", "howdy ra",
+        "em vishayam", "em jarigindi", "enti news",
     ],
 }
 
 # Minimum keyword matches to trigger an intent
 _THRESHOLD = 1
+
+# ── Trivial message fast-path ──────────────────────────────────────────────────
+# These messages require zero reasoning — bypass keyword + LLM classification
+# and return "chat" instantly so the orchestrator can route to the lightest model.
+import re as _trivial_re_mod
+
+_TRIVIAL_FASTPATH_RE = _trivial_re_mod.compile(
+    r"^\s*(hi+|hey+|hello+|howdy|hiya|heya|sup|what'?s\s+up|yo+|"
+    r"thanks?|thank\s+you|ty|thx|tnx|tq|"
+    r"ok+|okay|kk|cool|sure|got\s+it|noted|"
+    r"bye+|goodbye|cya|see\s+ya|"
+    r"good\s+morning|gm|good\s+night|gn|"
+    r"yes+|no+|yep|nope|nah|yeah+|yup|"
+    r"nice|great|awesome|perfect|good|wow|lol|haha)\s*[.!?]*\s*$",
+    _trivial_re_mod.IGNORECASE,
+)
 
 # Intents that need CoT / are high-stakes → prefer LLM verification
 _VERIFY_INTENTS = {"medical", "reasoning", "math"}
@@ -237,6 +282,14 @@ class IntentClassifier:
             return "chat", 0.5, "default"
 
         t0 = time.monotonic()
+
+        # ── Trivial fast-path (zero latency, no API call) ─────────────────────
+        # Short greetings / acks need no classification — return "chat" instantly.
+        # The orchestrator's _is_trivial_message() will further route to cheapest model.
+        stripped = message.strip()
+        if len(stripped.split()) <= 5 and _TRIVIAL_FASTPATH_RE.match(stripped) and not force_llm:
+            log.debug(f"[intent] Trivial fast-path: '{stripped[:30]}' → chat (trivial)")
+            return "chat", 0.95, "trivial"
 
         # Cache check (exact match only — good enough for repeated queries)
         cache_key = message.strip().lower()[:100]
