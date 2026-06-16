@@ -5,13 +5,11 @@
   "categories": {
     "fast_chat": {
       "_desc": "General chat \u2014 fastest possible response",
-      "primary": "groq/qwen-2.5-32b",
+      "primary": "fireworks_ai/accounts/fireworks/models/deepseek-v4-flash",
       "fallbacks": [
-        "groq/llama-3.1-8b-instant",
-        "openrouter/deepseek/deepseek-v4-flash",
-        "fireworks_ai/accounts/fireworks/models/deepseek-v4-flash",
         "groq/llama-3.3-70b-versatile",
-        "cerebras/llama-3.3-70b",
+        "groq/llama-3.1-8b-instant",
+        "fireworks_ai/accounts/fireworks/models/llama-v3p3-70b-instruct",
         "openrouter/meta-llama/llama-3.3-70b-instruct:free"
       ]
     },
@@ -19,8 +17,8 @@
       "_desc": "Deep reasoning, multi-step thinking, logic puzzles",
       "primary": "openrouter/deepseek/deepseek-r1:free",
       "fallbacks": [
-        "groq/llama-3.3-70b-versatile",
         "fireworks_ai/accounts/fireworks/models/deepseek-v4-flash",
+        "groq/llama-3.3-70b-versatile",
         "openrouter/deepseek/deepseek-chat-v3-0324:free"
       ]
     },
@@ -84,19 +82,16 @@
         "perplexity/sonar-reasoning",
         "perplexity/sonar",
         "together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
-        "cohere/command-r-plus",
         "groq/llama-3.3-70b-versatile"
       ]
     },
     "academic": {
       "_desc": "Research papers, citations, scholarly analysis",
-      "primary": "cohere/command-r-plus",
+      "primary": "fireworks_ai/accounts/fireworks/models/deepseek-v4-flash",
       "fallbacks": [
-        "openrouter/deepseek/deepseek-v4-flash",
+        "fireworks_ai/accounts/fireworks/models/llama-v3p3-70b-instruct",
         "together_ai/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
         "deepinfra/meta-llama/Meta-Llama-3.1-70B-Instruct",
-        "mistral/open-mixtral-8x22b",
-        "cerebras/llama-3.3-70b",
         "groq/llama-3.3-70b-versatile"
       ]
     },
@@ -108,7 +103,6 @@
         "deepseek/deepseek-reasoner",
         "openrouter/deepseek/deepseek-r1:free",
         "deepinfra/deepseek-ai/DeepSeek-R1",
-        "cohere/command-r-plus",
         "cerebras/llama-3.3-70b",
         "groq/llama-3.3-70b-versatile"
       ]
@@ -126,10 +120,8 @@
     },
     "fast_edge": {
       "_desc": "Ultra-fast, lightweight \u2014 sub-500ms responses",
-      "primary": "groq/qwen-2.5-32b",
+      "primary": "groq/llama-3.1-8b-instant",
       "fallbacks": [
-        "groq/llama-3.1-8b-instant",
-        "cerebras/llama-3.1-8b",
         "groq/gemma2-9b-it",
         "fireworks_ai/accounts/fireworks/models/llama-v3p1-8b-instruct",
         "deepinfra/meta-llama/Meta-Llama-3.1-8B-Instruct",

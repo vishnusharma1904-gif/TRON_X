@@ -176,9 +176,9 @@ _TRIVIAL_RE = _re.compile(
 )
 
 # Most capable model for Tenglish / multilingual conversations
-_TENGLISH_PREFERRED_MODEL  = "openrouter/deepseek/deepseek-r1:free"
-_TENGLISH_FALLBACK_MODEL   = "together_ai/deepseek-ai/DeepSeek-R1"
-_TENGLISH_CATEGORY         = "reasoning"
+_TENGLISH_PREFERRED_MODEL  = "fireworks_ai/accounts/fireworks/models/deepseek-v4-flash"
+_TENGLISH_FALLBACK_MODEL   = "fireworks_ai/accounts/fireworks/models/llama-v3p3-70b-instruct"
+_TENGLISH_CATEGORY         = "fast_chat"
 
 # Cheapest/fastest model for trivial English messages
 _TRIVIAL_PREFERRED_MODEL   = "groq/llama-3.1-8b-instant"
